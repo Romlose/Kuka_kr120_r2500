@@ -1,0 +1,14 @@
+path_constraint:
+  name: orientation_constraint
+  constraints:
+    - type: orientation
+      frame_id: base_link
+      desired: 
+        x: 0.0
+        y: 0.0
+        z: 1.0
+        w: 0.0
+      tolerance: 
+        x: 0.1
+        y: 0.1
+        z: 0.1

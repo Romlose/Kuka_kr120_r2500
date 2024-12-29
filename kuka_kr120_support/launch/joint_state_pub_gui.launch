@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="use_gui" default="true"/>
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"  output="screen" unless="$(arg use_gui)" />
+    <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui"  output="screen" if="$(arg use_gui)"/>
+</launch>

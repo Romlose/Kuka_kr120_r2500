@@ -1,0 +1,41 @@
+<launch>
+	<arg name="paused" default="false" doc="Start gazebo in paused mode" />
+
+  <!-- remap topics to conform to ROS-I specifications 
+  <remap from="/arm_controller/follow_joint_trajectory" to="/joint_trajectory_action" />
+  <remap from="/arm_controller/state" to="/feedback_states" />
+  <remap from="/arm_controller/command" to="/joint_path_command"/>
+  -->
+  <arg name="controller_config_file" default="$(find kuka_kr120_gazebo)/config/kr120r2500pro_arm_controller.yaml" doc="Config file used for defining the ROS-Control controllers."/>
+  <arg name="controllers" default="joint_state_controller eff_joint_traj_controller" doc="Controllers that are activated by default."/>
+  <arg name="stopped_controllers" default="joint_group_eff_controller" doc="Controllers that are initally loaded, but not started."/>
+
+  <!-- startup simulated world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="worlds/empty.world"/>
+    <arg name="gui" value="true"/>
+    <arg name="paused" value="$(arg paused)"/>
+  </include>
+
+  <!-- urdf xml robot description loaded on the Parameter Server, converting the xacro into a proper urdf file-->
+  <include file="$(find kuka_kr120_gazebo)/launch/load_kr120r2500pro.launch" />
+
+  <!-- push robot_description to factory and spawn robot in gazebo -->
+  <node name="kuka_kr120_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param robot_description -model kuka_kr120r2500pro" />
+
+    <!-- convert joint states to TF transforms for rviz, etc -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+  output="screen">
+  </node>
+
+  <!-- Start the 'driver' (ie: Gazebo in this case) -->
+  <include file="$(find kuka_kr120_gazebo)/launch/kr120r2500pro_control.launch.xml">
+    <arg name="controller_config_file" value="$(arg controller_config_file)"/>
+    <arg name="controllers" value="$(arg controllers)"/>
+    <arg name="stopped_controllers" value="$(arg stopped_controllers)"/>
+  </include>
+
+  <!-- init and start Gazebo ros_control interface 
+  <include file="$(find kuka_kr120_gazebo)/launch/kr120r2500pro_control.launch"/>
+  -->
+</launch>
